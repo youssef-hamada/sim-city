@@ -13,9 +13,11 @@ export function createScene() {
   gameWindow.appendChild(renderer.domElement);
 
   let meshes = [];
+  let building = [];
   function initialize(city) {
     scene.clear();
     meshes = [];
+    building = [];
     for (let x = 0; x < city.size; x++) {
       const column = [];
       for (let y = 0; y < city.size; y++) {
@@ -29,26 +31,40 @@ export function createScene() {
         mesh.position.set(x, -0.5, y);
         scene.add(mesh);
         column.push(mesh);
-
-        //building geometry
-        const tile = city.data[x][y];
-        console.log(tile);
-        if (tile.building == "building") {
-          const bulidingGeo = new THREE.BoxGeometry(1, 1, 1);
-          const bulidingMat = new THREE.MeshLambertMaterial({
-            color: 0x777777,
-            //   wireframe: true,
-          });
-          const bulidingMesh = new THREE.Mesh(bulidingGeo, bulidingMat);
-          bulidingMesh.position.set(x, 0, y);
-          scene.add(bulidingMesh);
-          column.push(bulidingMesh);
-        }
       }
       meshes.push(column);
+      building.push([...Array(city.size).fill(null)]);
     }
 
     setupLights();
+  }
+
+  function update(city) {
+    for (let x = 0; x < city.size; x++) {
+      for (let y = 0; y < city.size; y++) {
+        const tile = city.data[x][y];
+
+        if (tile.building && tile.building.startsWith("building")) {
+          let height = tile.building.slice(-1);
+          height = parseInt(height);
+          height = isNaN(height) || height < 1 ? 1 : height;
+
+          const buildingGeo = new THREE.BoxGeometry(1, height, 1);
+          const buildingMat = new THREE.MeshLambertMaterial({
+            color: 0x555555,
+          });
+
+          const buildingMesh = new THREE.Mesh(buildingGeo, buildingMat);
+          buildingMesh.position.set(x, height / 2, y);
+
+          if (building[x][y]) {
+            scene.remove(building[x][y]);
+          }
+          scene.add(buildingMesh);
+          building[x][y] = buildingMesh;
+        }
+      }
+    }
   }
 
   function setupLights() {
@@ -91,6 +107,7 @@ export function createScene() {
   }
 
   return {
+    update,
     initialize,
     start,
     stop,
