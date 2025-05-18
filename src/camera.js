@@ -5,7 +5,7 @@ export function createCamera(gameWindow) {
   const RIGHT_MOUSE_BUTTON = 2;
   const MIDDLE_MOUSE_BUTTON = 1;
 
-  const MIN_CAM_RADIUS = 2;
+  const MIN_CAM_RADIUS = 10;
   const MAX_CAM_RADIUS = 20;
 
   const Y_AXIS = new THREE.Vector3(0, 1, 0);
@@ -17,9 +17,9 @@ export function createCamera(gameWindow) {
     1000
   );
 
-  let cameraRadius = 5;
+  let cameraRadius = (MIN_CAM_RADIUS + MAX_CAM_RADIUS) / 2;
   let CameraAzimuth = 0;
-  let cameraElevation = 0;
+  let cameraElevation = 30;
   let isMouseDown = false;
   let prevMouseX = 0;
   let prevMouseY = 0;
