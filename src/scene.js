@@ -1,5 +1,6 @@
 import * as THREE from "https://unpkg.com/three@0.152.0/build/three.module.js";
 import { createCamera } from "./camera.js";
+import { createAssetsInstance } from "./assests.js";
 
 export function createScene() {
   const gameWindow = document.getElementById("render-target");
@@ -22,15 +23,12 @@ export function createScene() {
       const column = [];
       for (let y = 0; y < city.size; y++) {
         //grass geometry
-        const geo = new THREE.BoxGeometry(1, 1, 1);
-        const mat = new THREE.MeshLambertMaterial({
-          color: 0x00aa00,
-          //   wireframe: true,
-        });
-        const mesh = new THREE.Mesh(geo, mat);
-        mesh.position.set(x, -0.5, y);
-        scene.add(mesh);
-        column.push(mesh);
+        const terrianId = city.data[x][y].terrianId;
+        const mesh = createAssetsInstance(terrianId, x, y);
+        if (mesh) {
+          scene.add(mesh);
+          column.push(mesh);
+        }
       }
       meshes.push(column);
       building.push([...Array(city.size).fill(null)]);
@@ -42,26 +40,26 @@ export function createScene() {
   function update(city) {
     for (let x = 0; x < city.size; x++) {
       for (let y = 0; y < city.size; y++) {
-        const tile = city.data[x][y];
+        const oldMesh = building[x][y];
+        const newData = city.data[x][y];
+        const newId = newData.buildingId;
+        const newHeight = newData.height || 1;
+        console.log(newData);
 
-        if (tile.building && tile.building.startsWith("building")) {
-          let height = tile.building.slice(-1);
-          height = parseInt(height);
-          height = isNaN(height) || height < 1 ? 1 : height;
+        const oldId = oldMesh?.userData?.id;
+        const oldHeight = oldMesh?.userData?.height;
 
-          const buildingGeo = new THREE.BoxGeometry(1, height, 1);
-          const buildingMat = new THREE.MeshLambertMaterial({
-            color: 0x555555,
-          });
+        const needsUpdate = newId !== oldId || newHeight !== oldHeight;
 
-          const buildingMesh = new THREE.Mesh(buildingGeo, buildingMat);
-          buildingMesh.position.set(x, height / 2, y);
+        if (oldMesh && needsUpdate) {
+          scene.remove(oldMesh);
+          building[x][y] = null;
+        }
 
-          if (building[x][y]) {
-            scene.remove(building[x][y]);
-          }
-          scene.add(buildingMesh);
-          building[x][y] = buildingMesh;
+        if (needsUpdate && newId) {
+          const newMesh = createAssetsInstance(newId, x, y, newHeight);
+          scene.add(newMesh);
+          building[x][y] = newMesh;
         }
       }
     }
