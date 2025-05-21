@@ -6,7 +6,7 @@ const assets = {
   grass: (x, y, height = 1) => {
     const mat = new THREE.MeshLambertMaterial({ color: 0x00aa00 });
     const mesh = new THREE.Mesh(geo, mat);
-    mesh.userData = { id: "grass", height };
+    mesh.userData = { id: "grass", height, x, y };
     mesh.position.set(x, -0.5, y); // grass always fixed
     return mesh;
   },
@@ -16,7 +16,7 @@ const assets = {
     const mesh = new THREE.Mesh(geo, mat);
     mesh.scale.y = height;
     mesh.position.set(x, height / 2, y); // important
-    mesh.userData = { id: "building-1", height };
+    mesh.userData = { id: "building-1", height, x, y };
     return mesh;
   },
 
@@ -25,7 +25,7 @@ const assets = {
     const mesh = new THREE.Mesh(geo, mat);
     mesh.scale.y = height;
     mesh.position.set(x, height / 2, y); // important
-    mesh.userData = { id: "building-2", height };
+    mesh.userData = { id: "building-2", height, x, y };
     return mesh;
   },
 
@@ -34,7 +34,7 @@ const assets = {
     const mesh = new THREE.Mesh(geo, mat);
     mesh.scale.y = height;
     mesh.position.set(x, height / 2, y); // important
-    mesh.userData = { id: "building-3", height };
+    mesh.userData = { id: "building-3", height, x, y };
     return mesh;
   },
 };
